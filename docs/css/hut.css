@@ -1,0 +1,97 @@
+@import url("https://fonts.googleapis.com/css?family=Karla&display=swap");
+
+body {
+    font-family: "Karla",  "Arial", "Helvetica", "sans-serif";
+}
+
+.wy-nav-content-wrap{
+    background-color:#efefef;
+}
+/* links general */
+a{
+    color: #404040;
+}
+a:hover{
+    color: #3ac345;
+}
+a:visited{
+    color: #3ac345;
+}
+
+/* side nav style */
+.wy-nav-side {
+    background-color: #292521;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.75);
+}
+.wy-menu-vertical a {
+    color: #fff;
+}
+.wy-menu-vertical a:hover {
+    color: #ffdb54;
+    background-color: #404040;
+}
+
+/* side nav style */
+.wy-nav-content{
+    background: #efefef!important;
+}
+.wy-side-nav-search input[type=text] {
+    border-color: #292521;
+}
+
+.wy-side-nav-search > a img.logo {
+    display: block;
+    width: 80%;
+    height: 100%;
+
+}
+
+@media screen and (max-width: 768px) {
+    .wy-nav-side.shift {
+        width: 35%;
+        left: 0;
+    }
+}
+
+@media screen and (max-width: 768px){
+    .wy-nav-content-wrap.shift {
+        left: 35%;
+    }
+}
+@media screen and (max-width: 450px) {
+    .wy-nav-side.shift {
+        width: 75%;
+        left: 0;
+    }
+}
+
+@media screen and (max-width: 450px){
+    .wy-nav-content-wrap.shift {
+        left: 75%;
+    }
+}
+@media screen and (max-width: 768px){
+    .wy-nav-top {
+        background-color: #292521;
+    }
+
+    .wy-nav-top a{
+        display: none;
+    }
+}
+.wy-nav-content img{
+    border: 1px solid #000;
+}
+
+@media screen and (min-width: 767px) {
+
+   .wy-table-responsive table td {
+      /* !important prevents the common CSS stylesheets from overriding
+         this as on RTD they are loaded after this stylesheet */
+      white-space: normal !important;
+   }
+
+   .wy-table-responsive {
+      overflow: visible !important;
+   }
+}

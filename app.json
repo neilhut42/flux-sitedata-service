@@ -1,0 +1,47 @@
+{
+  "stack": "heroku-20",
+  "env": {
+    "SECRET_KEY": {
+      "value": ""
+    },
+    {
+    "FURY_AUTH": {
+      "value": ""
+    },
+    "ADMIN_PATH": {
+      "value": ""
+    },
+    "ADMIN_SITE_HEADER": {
+      "value": ""
+    },
+    "ADMIN_SITE_TITLE": {
+      "value": ""
+    },
+    "ADMIN_INDEX_TITLE": {
+      "value": ""
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "https://buildpack-registry.s3.amazonaws.com/buildpacks/heroku-community/nginx.tgz"
+    },
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-python.git"
+    }
+  ],
+  "addons": [
+    {
+      "plan": "heroku-postgresql:hobby-dev"
+    },
+    {
+      "plan": "papertrail:choklad"
+    },
+    {
+      "plan": "heroku-redis:hobby-dev"
+    },
+    {
+      "plan": "scheduler:standard"
+    }
+  ],
+  "success_url": "/"
+}

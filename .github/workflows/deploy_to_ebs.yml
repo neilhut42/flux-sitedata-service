@@ -1,0 +1,66 @@
+name: DeployToEBS
+on:
+  push:
+    branches:
+      - master
+      - v[0-9]+.[0-9]+
+jobs:
+  deploy:
+    runs-on: ubuntu-18.04
+    env:
+      ebs_app: ${{ secrets.EBS_APPLICATION_NAME }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set version label
+        run: echo "VERSION_LABEL=${GITHUB_REPOSITORY#*/}-${GITHUB_REF##*/}-${GITHUB_SHA}" >> $GITHUB_ENV
+
+      - name: Set release bundle name
+        if: ${{ env.ebs_app != '' }}
+        run: echo "RELASE_BUNDLE_NAME=${VERSION_LABEL}.zip" >> $GITHUB_ENV
+
+      - name: Set description
+        if: ${{ env.ebs_app != '' }}
+        run: echo "DESCRIPTION=${{ github.event.commits[0].message }}" >> $GITHUB_ENV
+
+      - name: Configure AWS Credentials
+        if: ${{ env.ebs_app != '' }}
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Set AWS config
+        if: ${{ env.ebs_app != '' }}
+        run: |
+          echo "AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" >> $GITHUB_ENV
+          echo "EBS_APPLICATION_NAME=${{ secrets.EBS_APPLICATION_NAME }}" >> $GITHUB_ENV
+          echo "EBS_TEST_ENVIRONMENT_NAME=${{ secrets.EBS_TEST_ENVIRONMENT_NAME }}" >> $GITHUB_ENV
+
+      - name: Adds FURY_AUTH
+        if: ${{ env.ebs_app != '' }}
+        run: echo -e "$(eval "echo -e \"`<requirements.txt`\"")" > requirements.txt
+      - name: Adds EBS packages
+        if: ${{ env.ebs_app != '' }}
+        run: cat requirements_ebs.txt >> requirements.txt
+      - name: Update Procfile for EBS
+        if: ${{ env.ebs_app != '' }}
+        run: mv Procfile.ebs Procfile
+
+      - name: Zip bundle
+        if: ${{ env.ebs_app != '' }}
+        run: zip -r ${RELASE_BUNDLE_NAME} . -x ".git/*" ".github/*"
+
+      - name: Upload to S3
+        if: ${{ env.ebs_app != '' }}
+        run: aws s3 cp ${RELASE_BUNDLE_NAME} s3://elasticbeanstalk-eu-west-1-637939682328/
+
+      - name: Deploy application version to EBS
+        if: ${{ env.ebs_app != '' }}
+        run: aws elasticbeanstalk create-application-version --application-name ${EBS_APPLICATION_NAME} --version-label ${VERSION_LABEL} --description "${DESCRIPTION}" --source-bundle S3Bucket="elasticbeanstalk-eu-west-1-637939682328",S3Key="${RELASE_BUNDLE_NAME}"
+
+      - name: Update non-master (non-live) environment for application version
+        if: ${{ (env.ebs_app != '') && (endsWith(github.ref, 'master') == false) }}
+        run: aws elasticbeanstalk update-environment --application-name ${EBS_APPLICATION_NAME} --environment-name ${EBS_TEST_ENVIRONMENT_NAME} --version-label ${VERSION_LABEL}
